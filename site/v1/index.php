@@ -4,6 +4,7 @@ require_once '../include/DbHandler.php';
 require_once '../include/PassHash.php';
 require '.././libs/Slim/Slim.php';
 
+
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim();
@@ -20,13 +21,13 @@ function authenticate(\Slim\Route $route) {
     $headers = apache_request_headers();
     $response = array();
     $app = \Slim\Slim::getInstance();
-
     // Verifying Authorization Header
-    if (isset($headers['Authorization'])) {
+
+    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
         $db = new DbHandler();
 
         // get the api key
-        $api_key = $headers['Authorization'];
+        $api_key = $_SERVER['HTTP_AUTHORIZATION'];
         // validating api key
         if (!$db->isValidApiKey($api_key)) {
             // api key is not present in users table

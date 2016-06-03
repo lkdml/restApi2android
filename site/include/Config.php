@@ -2,9 +2,9 @@
 /**
  * Database configuration
  */
-define('DB_USERNAME', 'root');
+define('DB_USERNAME', getenv('C9_USER'));
 define('DB_PASSWORD', '');
-define('DB_HOST', 'localhost');
+define('DB_HOST', getenv('IP'));
 define('DB_NAME', 'task_manager');
 
 define('USER_CREATED_SUCCESSFULLY', 0);

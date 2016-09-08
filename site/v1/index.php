@@ -60,12 +60,14 @@ function authenticate(\Slim\Route $route) {
  */
 $app->post('/register', function() use ($app) {
             // check for required params
-            verifyRequiredParams(array('name', 'email', 'password'));
+            verifyRequiredParams(array('nombre', 'apellido', 'usuario', 'email', 'password'));
 
             $response = array();
 
             // reading post params
-            $name = $app->request->post('name');
+            $nombre = $app->request->post('nombre');
+            $apellido = $app->request->post('apellido');
+            $usuario = $app->request->post('usuario');
             $email = $app->request->post('email');
             $password = $app->request->post('password');
 
@@ -73,17 +75,17 @@ $app->post('/register', function() use ($app) {
             validateEmail($email);
 
             $db = new DbHandler();
-            $res = $db->createUser($name, $email, $password);
+            $res = $db->createUser($nombre, $apellido, $usuario, $email, $password);
 
             if ($res == USER_CREATED_SUCCESSFULLY) {
                 $response["error"] = false;
-                $response["message"] = "You are successfully registered";
+                $response["message"] = "Su registro fue realizado con exito.!";
             } else if ($res == USER_CREATE_FAILED) {
                 $response["error"] = true;
-                $response["message"] = "Oops! An error occurred while registereing";
+                $response["message"] = "Oops! Ha ocurrido un error durante su registro.";
             } else if ($res == USER_ALREADY_EXISTED) {
                 $response["error"] = true;
-                $response["message"] = "Sorry, this email already existed";
+                $response["message"] = "Su correo o usuario ya existen en el sistema.";
             }
             // echo json response
             echoRespnse(201, $response);
@@ -97,18 +99,23 @@ $app->post('/register', function() use ($app) {
  */
 $app->post('/login', function() use ($app) {
             // check for required params
-            verifyRequiredParams(array('email', 'password'));
+            verifyRequiredParams(array('usuario','email', 'password'));
 
             // reading post params
+            $usuario = $app->request()->post('usuario');
             $email = $app->request()->post('email');
             $password = $app->request()->post('password');
             $response = array();
 
             $db = new DbHandler();
             // check for correct email and password
-            if ($db->checkLogin($email, $password)) {
+            if ($db->checkLogin($usuario, $email, $password)) {
                 // get the user by email
-                $user = $db->getUserByEmail($email);
+                if (is_null($usuario)){
+                    $user = $db->getUserByEmail($email);
+                } else if (is_null($email)){
+                    $user = $db->getUserByEmail($usuario);
+                }
 
                 if ($user != NULL) {
                     $response["error"] = false;
@@ -119,12 +126,12 @@ $app->post('/login', function() use ($app) {
                 } else {
                     // unknown error occurred
                     $response['error'] = true;
-                    $response['message'] = "An error occurred. Please try again";
+                    $response['message'] = "Ha ocurrido un error, intente denuevo.";
                 }
             } else {
                 // user credentials are wrong
                 $response['error'] = true;
-                $response['message'] = 'Login failed. Incorrect credentials';
+                $response['message'] = 'ha ingresado datos incorrectos.';
             }
 
             echoRespnse(200, $response);
@@ -135,53 +142,55 @@ $app->post('/login', function() use ($app) {
  */
 
 /**
- * Listing all tasks of particual user
+ * Listing all categorias of particual user
  * method GET
- * url /tasks          
+ * url /categorias          
  */
-$app->get('/tasks', 'authenticate', function() {
+$app->get('/categorias', 'authenticate', function() {
             global $user_id;
             $response = array();
             $db = new DbHandler();
 
             // fetching all user tasks
-            $result = $db->getAllUserTasks($user_id);
+            $result = $db->getAllUserTasks($user_id); //TODO Creo q esto no funca.
 
             $response["error"] = false;
-            $response["tasks"] = array();
+            $response["categorias"] = array();
 
             // looping through result and preparing tasks array
             while ($task = $result->fetch_assoc()) {
                 $tmp = array();
-                $tmp["id"] = $task["id"];
-                $tmp["task"] = $task["task"];
-                $tmp["status"] = $task["status"];
+                $tmp["id"] = $task["id_categoria"];
+                $tmp["titulo"] = $task["titulo"];
+                $tmp["desc"] = $task["descripcion"];
+                $tmp["url_foto"] = $task["url_foto"];
                 $tmp["createdAt"] = $task["created_at"];
-                array_push($response["tasks"], $tmp);
+                array_push($response["categorias"], $tmp);
             }
 
             echoRespnse(200, $response);
         });
 
 /**
- * Listing single task of particual user
+ * Listing single categorias of particual user
  * method GET
- * url /tasks/:id
+ * url /categorias/:id
  * Will return 404 if the task doesn't belongs to user
  */
-$app->get('/tasks/:id', 'authenticate', function($task_id) {
+$app->get('/categorias/:id', 'authenticate', function($categoria_id) {
             global $user_id;
             $response = array();
             $db = new DbHandler();
 
             // fetch task
-            $result = $db->getTask($task_id, $user_id);
+            $result = $db->getCategorias($categoria_id, $user_id);
 
             if ($result != NULL) {
                 $response["error"] = false;
                 $response["id"] = $result["id"];
-                $response["task"] = $result["task"];
-                $response["status"] = $result["status"];
+                $response["titulo"] = $result["titulo"];
+                $response["desc"] = $result["desc"];
+                $response["url_foto"] = $result["url_foto"];
                 $response["createdAt"] = $result["created_at"];
                 echoRespnse(200, $response);
             } else {
@@ -192,32 +201,32 @@ $app->get('/tasks/:id', 'authenticate', function($task_id) {
         });
 
 /**
- * Creating new task in db
+ * Creating new categorias in db
  * method POST
  * params - name
- * url - /tasks/
+ * url - /categorias/
  */
-$app->post('/tasks', 'authenticate', function() use ($app) {
+$app->post('/categorias', 'authenticate', function() use ($app) {
             // check for required params
-            verifyRequiredParams(array('task'));
+            verifyRequiredParams(array('categoria'));
 
             $response = array();
-            $task = $app->request->post('task');
+            $categoria = $app->request->post('categoria');
 
             global $user_id;
             $db = new DbHandler();
 
             // creating new task
-            $task_id = $db->createTask($user_id, $task);
+            $categoria_id = $db->createTask($user_id, $categoria);
 
             if ($task_id != NULL) {
                 $response["error"] = false;
-                $response["message"] = "Task created successfully";
-                $response["task_id"] = $task_id;
+                $response["message"] = "Categoria creada satisfactoriamente";
+                $response["categoria_id"] = $categoria_id;
                 echoRespnse(201, $response);
             } else {
                 $response["error"] = true;
-                $response["message"] = "Failed to create task. Please try again";
+                $response["message"] = "Algo a pasado, intente nuevamente...";
                 echoRespnse(200, $response);
             }            
         });

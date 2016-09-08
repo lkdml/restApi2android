@@ -1,0 +1,15 @@
+#Usuarios
+Nombre
+Apellido
+Mail
+usuario
+clave
+
+
+#Categoria.
+usuario_id
+Titulo
+descripcion
+url_foto
+favorita
+

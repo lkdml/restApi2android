@@ -26,7 +26,7 @@ class DbHandler {
      * @param String $email User login email id
      * @param String $password User login password
      */
-    public function createUser($name, $email, $password) {
+    public function createUser($nombre, $apellido , $usuario, $email, $password) {
         require_once 'PassHash.php';
         $response = array();
 
@@ -39,8 +39,8 @@ class DbHandler {
             $api_key = $this->generateApiKey();
 
             // insert query
-            $stmt = $this->conn->prepare("INSERT INTO users(name, email, password_hash, api_key, status) values(?, ?, ?, ?, 1)");
-            $stmt->bind_param("ssss", $name, $email, $password_hash, $api_key);
+            $stmt = $this->conn->prepare("INSERT INTO users(nombre, apellido, usuario, email, password_hash, api_key, status) values(?, ?, ?, ?, ?, ?, 1)");
+            $stmt->bind_param("ssssss", $nombre, $apellido, $usuario, $email, $password_hash, $api_key);
 
             $result = $stmt->execute();
 
@@ -68,11 +68,11 @@ class DbHandler {
      * @param String $password User login password
      * @return boolean User login status success/fail
      */
-    public function checkLogin($email, $password) {
+    public function checkLogin($usuario, $email, $password) {
         // fetching user by email
-        $stmt = $this->conn->prepare("SELECT password_hash FROM users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT password_hash FROM usuarios WHERE email = ? or usuario = ?");
 
-        $stmt->bind_param("s", $email);
+        $stmt->bind_param("ss", $email, $usuario);
 
         $stmt->execute();
 
@@ -109,7 +109,7 @@ class DbHandler {
      * @return boolean
      */
     private function isUserExists($email) {
-        $stmt = $this->conn->prepare("SELECT id from users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT id_usuario as id from usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->store_result();
@@ -119,11 +119,34 @@ class DbHandler {
     }
 
     /**
+     * Fetching user by usuario
+     * @param String $usuario Usuario 
+     */
+    public function getUserByUserName($usuario) {
+        $stmt = $this->conn->prepare("SELECT CONCAT(nombre, ' ', apellido) As name, email, api_key, status, created_at FROM usuarios WHERE usuario = ?");
+        $stmt->bind_param("s", $usuario);
+        if ($stmt->execute()) {
+            // $user = $stmt->get_result()->fetch_assoc();
+            $stmt->bind_result($name, $email, $api_key, $status, $created_at);
+            $stmt->fetch();
+            $user = array();
+            $user["name"] = $name;
+            $user["email"] = $email;
+            $user["api_key"] = $api_key;
+            $user["status"] = $status;
+            $user["created_at"] = $created_at;
+            $stmt->close();
+            return $user;
+        } else {
+            return NULL;
+        }
+    }
+    /**
      * Fetching user by email
      * @param String $email User email id
      */
     public function getUserByEmail($email) {
-        $stmt = $this->conn->prepare("SELECT name, email, api_key, status, created_at FROM users WHERE email = ?");
+        $stmt = $this->conn->prepare("SELECT CONCAT(nombre, ' ', apellido) As name, email, api_key, status, created_at FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);
         if ($stmt->execute()) {
             // $user = $stmt->get_result()->fetch_assoc();
@@ -147,7 +170,7 @@ class DbHandler {
      * @param String $user_id user id primary key in user table
      */
     public function getApiKeyById($user_id) {
-        $stmt = $this->conn->prepare("SELECT api_key FROM users WHERE id = ?");
+        $stmt = $this->conn->prepare("SELECT api_key FROM usuarios WHERE id_usuario = ?");
         $stmt->bind_param("i", $user_id);
         if ($stmt->execute()) {
             // $api_key = $stmt->get_result()->fetch_assoc();
@@ -165,7 +188,7 @@ class DbHandler {
      * @param String $api_key user api key
      */
     public function getUserId($api_key) {
-        $stmt = $this->conn->prepare("SELECT id FROM users WHERE api_key = ?");
+        $stmt = $this->conn->prepare("SELECT id_usuario as id FROM usuarios WHERE api_key = ?");
         $stmt->bind_param("s", $api_key);
         if ($stmt->execute()) {
             $stmt->bind_result($user_id);
@@ -186,7 +209,7 @@ class DbHandler {
      * @return boolean
      */
     public function isValidApiKey($api_key) {
-        $stmt = $this->conn->prepare("SELECT id from users WHERE api_key = ?");
+        $stmt = $this->conn->prepare("SELECT id_usuario as id from usuarios WHERE api_key = ?");
         $stmt->bind_param("s", $api_key);
         $stmt->execute();
         $stmt->store_result();
@@ -209,17 +232,17 @@ class DbHandler {
      * @param String $user_id user id to whom task belongs to
      * @param String $task task text
      */
-    public function createTask($user_id, $task) {
-        $stmt = $this->conn->prepare("INSERT INTO tasks(task) VALUES(?)");
-        $stmt->bind_param("s", $task);
+    public function createTask($user_id, $categoria) {
+        $stmt = $this->conn->prepare("INSERT INTO categorias VALUES(?)"); //FIX puede fallar
+        $stmt->bind_param("s", $categoria);
         $result = $stmt->execute();
         $stmt->close();
 
         if ($result) {
             // task row created
             // now assign the task to user
-            $new_task_id = $this->conn->insert_id;
-            $res = $this->createUserTask($user_id, $new_task_id);
+            $nuevaCategoria_id = $this->conn->insert_id;
+            $res = $this->createUserTask($user_id, $nuevaCategoria_id);
             if ($res) {
                 // task created successfully
                 return $new_task_id;
@@ -237,18 +260,19 @@ class DbHandler {
      * Fetching single task
      * @param String $task_id id of the task
      */
-    public function getTask($task_id, $user_id) {
-        $stmt = $this->conn->prepare("SELECT t.id, t.task, t.status, t.created_at from tasks t, user_tasks ut WHERE t.id = ? AND ut.task_id = t.id AND ut.user_id = ?");
-        $stmt->bind_param("ii", $task_id, $user_id);
+    public function getCategorias($categoria_id, $user_id) {
+        $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c, WHERE c.id_categoria = ? AND c.id_usuario = ?");
+        $stmt->bind_param("ii", $categoria_id, $user_id);
         if ($stmt->execute()) {
             $res = array();
-            $stmt->bind_result($id, $task, $status, $created_at);
+            $stmt->bind_result($id, $titulo, $desc, $url_foto, $created_at);
             // TODO
             // $task = $stmt->get_result()->fetch_assoc();
             $stmt->fetch();
             $res["id"] = $id;
-            $res["task"] = $task;
-            $res["status"] = $status;
+            $res["titulo"] = $titulo;
+            $res["desc"] = $desc;
+            $res["url_foto"] = $url_foto;
             $res["created_at"] = $created_at;
             $stmt->close();
             return $res;
@@ -262,7 +286,7 @@ class DbHandler {
      * @param String $user_id id of the user
      */
     public function getAllUserTasks($user_id) {
-        $stmt = $this->conn->prepare("SELECT t.* FROM tasks t, user_tasks ut WHERE t.id = ut.task_id AND ut.user_id = ?");
+        $stmt = $this->conn->prepare("SELECT c.* FROM categorias c WHERE c.id_usuario = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $tasks = $stmt->get_result();
@@ -304,7 +328,7 @@ class DbHandler {
      * Function to assign a task to user
      * @param String $user_id id of the user
      * @param String $task_id id of the task
-     */
+     * /
     public function createUserTask($user_id, $task_id) {
         $stmt = $this->conn->prepare("INSERT INTO user_tasks(user_id, task_id) values(?, ?)");
         $stmt->bind_param("ii", $user_id, $task_id);
@@ -316,7 +340,7 @@ class DbHandler {
         $stmt->close();
         return $result;
     }
-
+*/
 }
 
 ?>

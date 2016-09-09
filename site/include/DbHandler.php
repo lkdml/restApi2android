@@ -34,12 +34,11 @@ class DbHandler {
         if (!$this->isUserExists($email)) {
             // Generating password hash
             $password_hash = PassHash::hash($password);
-
             // Generating API key
             $api_key = $this->generateApiKey();
 
             // insert query
-            $stmt = $this->conn->prepare("INSERT INTO users(nombre, apellido, usuario, email, password_hash, api_key, status) values(?, ?, ?, ?, ?, ?, 1)");
+            $stmt = $this->conn->prepare("INSERT INTO usuarios(nombre, apellido, usuario, email, password_hash, api_key, status) values(?, ?, ?, ?, ?, ?, 1)");
             $stmt->bind_param("ssssss", $nombre, $apellido, $usuario, $email, $password_hash, $api_key);
 
             $result = $stmt->execute();
@@ -68,11 +67,12 @@ class DbHandler {
      * @param String $password User login password
      * @return boolean User login status success/fail
      */
-    public function checkLogin($usuario, $email, $password) {
+    public function checkLogin( $email, $password) {
+        
         // fetching user by email
-        $stmt = $this->conn->prepare("SELECT password_hash FROM usuarios WHERE email = ? or usuario = ?");
+        $stmt = $this->conn->prepare("SELECT password_hash FROM usuarios WHERE email = ?");
 
-        $stmt->bind_param("ss", $email, $usuario);
+        $stmt->bind_param("s", $email);
 
         $stmt->execute();
 
@@ -232,9 +232,9 @@ class DbHandler {
      * @param String $user_id user id to whom task belongs to
      * @param String $task task text
      */
-    public function createTask($user_id, $categoria) {
-        $stmt = $this->conn->prepare("INSERT INTO categorias VALUES(?)"); //FIX puede fallar
-        $stmt->bind_param("s", $categoria);
+    public function createCategoria($user_id, $titulo, $descripcion) {
+        $stmt = $this->conn->prepare("INSERT INTO categorias(id_usuario,titulo,descripcion) VALUES(?,?,?)"); //FIX puede fallar
+        $stmt->bind_param("iss", $user_id,$titulo, $descripcion);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -242,10 +242,10 @@ class DbHandler {
             // task row created
             // now assign the task to user
             $nuevaCategoria_id = $this->conn->insert_id;
-            $res = $this->createUserTask($user_id, $nuevaCategoria_id);
-            if ($res) {
+            //$res = $this->createUserTask($user_id, $nuevaCategoria_id);
+            if (!is_null($nuevaCategoria_id)) {
                 // task created successfully
-                return $new_task_id;
+                return $nuevaCategoria_id;
             } else {
                 // task failed to create
                 return NULL;
@@ -300,9 +300,9 @@ class DbHandler {
      * @param String $task task text
      * @param String $status task status
      */
-    public function updateTask($user_id, $task_id, $task, $status) {
-        $stmt = $this->conn->prepare("UPDATE tasks t, user_tasks ut set t.task = ?, t.status = ? WHERE t.id = ? AND t.id = ut.task_id AND ut.user_id = ?");
-        $stmt->bind_param("siii", $task, $status, $task_id, $user_id);
+    public function updateTask($user_id, $categoria_id, $titulo, $descripcion) {
+        $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
+        $stmt->bind_param("ssii", $titulo, $descripcion, $categoria_id, $user_id);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();

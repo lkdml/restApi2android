@@ -99,7 +99,7 @@ $app->post('/register', function() use ($app) {
  */
 $app->post('/login', function() use ($app) {
             // check for required params
-            verifyRequiredParams(array('usuario','email', 'password'));
+            verifyRequiredParams(array('email', 'password'));
 
             // reading post params
             $usuario = $app->request()->post('usuario');
@@ -109,13 +109,9 @@ $app->post('/login', function() use ($app) {
 
             $db = new DbHandler();
             // check for correct email and password
-            if ($db->checkLogin($usuario, $email, $password)) {
+            if ($db->checkLogin($email, $password)) {
                 // get the user by email
-                if (is_null($usuario)){
                     $user = $db->getUserByEmail($email);
-                } else if (is_null($email)){
-                    $user = $db->getUserByEmail($usuario);
-                }
 
                 if ($user != NULL) {
                     $response["error"] = false;
@@ -131,7 +127,7 @@ $app->post('/login', function() use ($app) {
             } else {
                 // user credentials are wrong
                 $response['error'] = true;
-                $response['message'] = 'ha ingresado datos incorrectos.';
+                $response['message'] = 'ha ingresado datos incorrectos, o aun no se ha registrado.';
             }
 
             echoRespnse(200, $response);
@@ -203,23 +199,28 @@ $app->get('/categorias/:id', 'authenticate', function($categoria_id) {
 /**
  * Creating new categorias in db
  * method POST
- * params - name
+ * params - titulo
+ * params - desc
+ * params - foto
  * url - /categorias/
  */
-$app->post('/categorias', 'authenticate', function() use ($app) {
+$app->post('/categorias', 'authenticate', function() use ($app) { //TODO falta agregar el manejo de la imagen.
             // check for required params
-            verifyRequiredParams(array('categoria'));
+            verifyRequiredParams(array('titulo','descripcion'));
 
             $response = array();
-            $categoria = $app->request->post('categoria');
+            $titulo = $app->request->post('titulo');
+            $descripcion = $app->request->post('descripcion');
+            
+            
 
             global $user_id;
             $db = new DbHandler();
 
             // creating new task
-            $categoria_id = $db->createTask($user_id, $categoria);
+            $categoria_id = $db->createCategoria($user_id, $titulo , $descripcion);
 
-            if ($task_id != NULL) {
+            if ($categoria_id != NULL) {
                 $response["error"] = false;
                 $response["message"] = "Categoria creada satisfactoriamente";
                 $response["categoria_id"] = $categoria_id;
@@ -237,27 +238,28 @@ $app->post('/categorias', 'authenticate', function() use ($app) {
  * params task, status
  * url - /tasks/:id
  */
-$app->put('/tasks/:id', 'authenticate', function($task_id) use($app) {
+$app->put('/categorias/:id', 'authenticate', function($task_id) use($app) {
             // check for required params
-            verifyRequiredParams(array('task', 'status'));
+            verifyRequiredParams(array('categoria_id', 'titulo','descripcion'));
 
             global $user_id;            
-            $task = $app->request->put('task');
-            $status = $app->request->put('status');
+            $categoria_id = $app->request->put('categoria_id');
+            $titulo = $app->request->put('titulo');
+            $descripcion = $app->request->put('descripcion');
 
             $db = new DbHandler();
             $response = array();
 
             // updating task
-            $result = $db->updateTask($user_id, $task_id, $task, $status);
+            $result = $db->updateTask($user_id, $categoria_id, $titulo, $descripcion);
             if ($result) {
                 // task updated successfully
                 $response["error"] = false;
-                $response["message"] = "Task updated successfully";
+                $response["message"] = "Categoria actualizada correctamente";
             } else {
                 // task failed to update
                 $response["error"] = true;
-                $response["message"] = "Task failed to update. Please try again!";
+                $response["message"] = "Fallo la actualización, intente nuevamente.";
             }
             echoRespnse(200, $response);
         });

@@ -21,11 +21,11 @@ CREATE TABLE IF NOT EXISTS `categorias` (
   `id_categoria` int(11) NOT NULL AUTO_INCREMENT,
   `id_usuario` int(11) NOT NULL,
   `titulo` varchar(50) NOT NULL ,
-  `descripcion` varchar(50) NOT NULL ,
-  `url_foto` varchar(50) NOT NULL ,
+  `descripcion` varchar(50) DEFAULT NULL ,
+  `url_foto` varchar(50) DEFAULT NULL ,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_categoria`),
-  FOREIGN KEY (  `id_usuario` ) REFERENCES  `tp_categorias`.`usuario` (`id_usuario`) 
+  FOREIGN KEY (  `id_usuario` ) REFERENCES  `tp_categorias`.`usuarios` (`id_usuario`) 
   ON DELETE CASCADE ON UPDATE CASCADE
   );
 

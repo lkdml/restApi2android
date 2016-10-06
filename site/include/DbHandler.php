@@ -261,7 +261,7 @@ class DbHandler {
      * @param String $task_id id of the task
      */
     public function getCategorias($categoria_id, $user_id) {
-        $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c, WHERE c.id_categoria = ? AND c.id_usuario = ?");
+        $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c WHERE c.id_categoria = ? AND c.id_usuario = ?");
         $stmt->bind_param("ii", $categoria_id, $user_id);
         if ($stmt->execute()) {
             $res = array();
@@ -293,16 +293,23 @@ class DbHandler {
         $stmt->close();
         return $tasks;
     }
-
+    private function guardarImagen($array_File){
+        return false;
+    }
     /**
      * Updating task
      * @param String $task_id id of the task
      * @param String $task task text
      * @param String $status task status
      */
-    public function updateTask($user_id, $categoria_id, $titulo, $descripcion) {
-        $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
-        $stmt->bind_param("ssii", $titulo, $descripcion, $categoria_id, $user_id);
+    public function updateCategoria($user_id, $categoria_id, $titulo, $descripcion, $array_file=null) {
+        if (!is_null($array_file)){
+            $rutaImg = $this->guardarImagen($array_file);
+        } else {
+            $rutaImg = '';
+        }
+        $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ?, url_foto = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
+        $stmt->bind_param("ssisi", $titulo, $descripcion, $categoria_id, $rutaImg, $user_id);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();
@@ -313,9 +320,9 @@ class DbHandler {
      * Deleting a task
      * @param String $task_id id of the task to delete
      */
-    public function deleteTask($user_id, $task_id) {
-        $stmt = $this->conn->prepare("DELETE t FROM tasks t, user_tasks ut WHERE t.id = ? AND ut.task_id = t.id AND ut.user_id = ?");
-        $stmt->bind_param("ii", $task_id, $user_id);
+    public function deleteCategoria($user_id, $categoria_id) {
+        $stmt = $this->conn->prepare("DELETE c FROM categorias c, usuarios u WHERE c.id_categoria = ? AND u.id_usuario = t.id_usuario AND u.id_usuario = ?");
+        $stmt->bind_param("ii", $categoria_id, $user_id);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();

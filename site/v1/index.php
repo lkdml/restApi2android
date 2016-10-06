@@ -238,7 +238,7 @@ $app->post('/categorias', 'authenticate', function() use ($app) { //TODO falta a
  * params task, status
  * url - /tasks/:id
  */
-$app->put('/categorias/:id', 'authenticate', function($task_id) use($app) {
+$app->put('/categorias/:id', 'authenticate', function($categoria_id) use($app) { //TODO Creo q esta mal no usar el task_id
             // check for required params
             verifyRequiredParams(array('categoria_id', 'titulo','descripcion'));
 
@@ -246,12 +246,13 @@ $app->put('/categorias/:id', 'authenticate', function($task_id) use($app) {
             $categoria_id = $app->request->put('categoria_id');
             $titulo = $app->request->put('titulo');
             $descripcion = $app->request->put('descripcion');
-
+            $array_foto = $app->request->put('foto');
+            var_dump($array_foto);die;
             $db = new DbHandler();
             $response = array();
 
             // updating task
-            $result = $db->updateTask($user_id, $categoria_id, $titulo, $descripcion);
+            $result = $db->updateCategoria($user_id, $categoria_id, $titulo, $descripcion,$array_foto);
             if ($result) {
                 // task updated successfully
                 $response["error"] = false;
@@ -265,16 +266,16 @@ $app->put('/categorias/:id', 'authenticate', function($task_id) use($app) {
         });
 
 /**
- * Deleting task. Users can delete only their tasks
+ * Deleting categoria. Users can delete only their tasks
  * method DELETE
  * url /tasks
  */
-$app->delete('/tasks/:id', 'authenticate', function($task_id) use($app) {
+$app->delete('/categorias/:id', 'authenticate', function($categoria_id) use($app) {
             global $user_id;
 
             $db = new DbHandler();
             $response = array();
-            $result = $db->deleteTask($user_id, $task_id);
+            $result = $db->deleteCategoria($user_id, $categoria_id);
             if ($result) {
                 // task deleted successfully
                 $response["error"] = false;

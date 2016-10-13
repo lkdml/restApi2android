@@ -246,8 +246,8 @@ $app->put('/categorias/:id', 'authenticate', function($categoria_id) use($app) {
             $categoria_id = $app->request->put('categoria_id');
             $titulo = $app->request->put('titulo');
             $descripcion = $app->request->put('descripcion');
-            $array_foto = $app->request->put('foto');
-            var_dump($array_foto);die;
+            //$array_foto = $app->request->put('foto');
+            $array_foto = null;
             $db = new DbHandler();
             $response = array();
 

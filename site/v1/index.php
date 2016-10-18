@@ -148,7 +148,7 @@ $app->get('/categorias', 'authenticate', function() {
             $db = new DbHandler();
 
             // fetching all user tasks
-            $result = $db->getAllUserTasks($user_id); //TODO Creo q esto no funca.
+            $result = $db->getAllUserCategories($user_id); //TODO Creo q esto no funca.
 
             $response["error"] = false;
             $response["categorias"] = array();
@@ -179,7 +179,7 @@ $app->get('/categorias/:id', 'authenticate', function($categoria_id) {
             $db = new DbHandler();
 
             // fetch task
-            $result = $db->getCategorias($categoria_id, $user_id);
+            $result = $db->getCategoria($categoria_id, $user_id);
 
             if ($result != NULL) {
                 $response["error"] = false;

@@ -188,18 +188,12 @@ class DbHandler {
      * @param String $api_key user api key
      */
     public function getUserId($api_key) {
-        $stmt = $this->conn->prepare("SELECT id_usuario as id FROM usuarios WHERE api_key = ?");
+        $stmt = $this->conn->prepare("SELECT id_usuario as id from usuarios WHERE api_key = ?");
         $stmt->bind_param("s", $api_key);
-        if ($stmt->execute()) {
-            $stmt->bind_result($user_id);
-            $stmt->fetch();
-            // TODO
-            // $user_id = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-            return $user_id;
-        } else {
-            return NULL;
-        }
+        $stmt->execute();
+        $user_id = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $user_id;
     }
 
     /**
@@ -260,7 +254,7 @@ class DbHandler {
      * Fetching single task
      * @param String $task_id id of the task
      */
-    public function getCategorias($categoria_id, $user_id) {
+    public function getCategoria($categoria_id, $user_id) {
         $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c WHERE c.id_categoria = ? AND c.id_usuario = ?");
         $stmt->bind_param("ii", $categoria_id, $user_id);
         if ($stmt->execute()) {
@@ -285,7 +279,7 @@ class DbHandler {
      * Fetching all user tasks
      * @param String $user_id id of the user
      */
-    public function getAllUserTasks($user_id) {
+    public function getAllUserCategories($user_id) {
         $stmt = $this->conn->prepare("SELECT c.* FROM categorias c WHERE c.id_usuario = ?");
         $stmt->bind_param("i", $user_id);
         $stmt->execute();

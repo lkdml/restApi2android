@@ -1380,7 +1380,138 @@ class Slim
      */
     protected function defaultNotFound()
     {
-        echo static::generateTemplateMarkup('404 Page Not Found', '<p>The page you are looking for could not be found. Check the address bar to ensure your URL is spelled correctly. If all else fails, you can visit our home page at the link below.</p><a href="' . $this->request->getRootUri() . '/">Visit the Home Page</a>');
+        echo static::generateTemplateMarkup('404 Page Not Found', '<p>Esta pagina es resultado de la apiREST para el TP de Laboratorio V de UTN FRA.</p>
+                                            <br><p>Para probar la apiREST, deben descargar la extension de chrome llamada "ARC" (advanced REST Client), e importar el archivo arc-export.json con las consultas tipo a realizar.</p>
+                                            <br><a href="./arc-export.json">arc-export.json</a>
+                                            <br><p>Posteriormente importarlos dentro de la aplicacion ARC</p>
+                                            <br>
+                                            <h4>Datos para el uso de la API:</h4>
+                                            <!-- CSS goes in the document HEAD or added to your external stylesheet -->
+<style type="text/css">
+table.gridtable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.gridtable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.gridtable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+</style>
+<!-- Table goes in the document BODY -->
+
+
+                                            <table class="gridtable">
+                                                <tr>
+                                                    <th>Operacion</th>
+                                                    <th>Metodo</th>
+                                                    <th>URL</th>
+                                                    <th>Parametros</th>
+                                                    <th>Descripcion</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>Registrar Usuario</td>
+                                                    <td>POST</td>
+                                                    <td>http://lkdml.myq-see.com/register</td>
+                                                    <td><li>nombre
+                                                    <li>apellido
+                                                    <li>usuario
+                                                    <li>email
+                                                    <li>password
+                                                    </td>
+                                                    <td>Envia los datos necesarios para el registro de un usuario, y devuelve un mensaje en formato JSON
+                                                        <li> Si es positivo: <br>
+                                                        {"error": false "message": "Su registro fue realizado con exito.!"}
+                                                        <li> Si es Negativo: <br>
+                                                        {"error": true "message": "Su correo o usuario ya existen en el sistema."}<br>
+                                                        {"error": true "message": "Required field(s) "Nombre del campo" is missing or empty"}<br>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Login</td>
+                                                    <td>POST</td>
+                                                    <td>http://lkdml.myq-see.com/login</td>
+                                                    <td>
+                                                    <li>email
+                                                    <li>password
+                                                    </td>
+                                                    <td>Intenta hacer un login, si es correcto devolvera un JSON donde lo que mas importa es el apiKey
+                                                    <li> Si es positivo: <br>
+                                                        {"error": false<br>"name": "usuario uno"<br>"email": "usuario1@gmail.com"<br>"apiKey": "11017deda50a5125ad577b6468ab8e85"<br>"createdAt": "2016-10-18 18:06:13"<br>}
+                                                    <li> Si es Negativo: <br>
+                                                        {"error": true<br>"message": "ha ingresado datos incorrectos, o aun no se ha registrado."<br>}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Agregar Categoria</td>
+                                                    <td>POST</td>
+                                                    <td>http://lkdml.myq-see.com/categorias</td>
+                                                    <td>
+                                                    <li>AUTHORIZATION = "apiKey"
+                                                    <li>titulo
+                                                    <li>descripcion
+                                                    <li>(proximamente foto)</td>
+                                                    <td>Intenta hacer un alta de una categoria:
+                                                    <li> Si es positivo: <br>
+                                                        {"error": false<br>"message": "Categoria creada satisfactoriamente"<br>"categoria_id": 3<br>}
+                                                    <li> Si es Negativo: <br>
+                                                        {"error": true<br>"message": "Required field(s) descripcion is missing or empty"<br>} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Listar Categorias</td>
+                                                    <td>GET</td>
+                                                    <td>http://lkdml.myq-see.com/categorias</td>
+                                                    <td><li>AUTHORIZATION = "apiKey" </td>
+                                                    <td> Devuelve todas las categorias del usuario identificado con la apiKey:
+                                                    <li> Si es positivo: <br>
+                                                        {"error": false<br> "categorias": [3]<br>       0:  {"id": 1<br>            "titulo": "nueva categoria2"<br>            "desc": "Esto es lo que quiero q funcione.!!!!"<br>         "url_foto": null<br>"createdAt": "2016-10-18 18:16:10"<br>}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Consultar 1 Categoria</td>
+                                                    <td>GET</td>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Actualizar Categoria</td>
+                                                    <td>PUT</td>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Borrar Categoria</td>
+                                                    <td>DELETE</td>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                            <a href="' . $this->request->getRootUri() . '/">Ir al Home</a>');
     }
 
     /**

@@ -245,7 +245,7 @@ $app->put('/test/:id', function ($id) use ($app) {
  */
 $app->put('/categorias', 'authenticate', function() use($app) { //TODO Creo q esta mal no usar el task_id
             // check for required params
-            verifyRequiredParams(array('categoria_id', 'titulo','descripcion'));
+            //verifyRequiredParams(array('categoria_id', 'titulo','descripcion'));
 
             global $user_id;   
             $categoria_id = $app->request->put('categoria_id');

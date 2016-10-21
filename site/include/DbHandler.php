@@ -302,12 +302,6 @@ class DbHandler {
         } else {
             $rutaImg = '';
         }
-        var_dump($titulo);
-        var_dump($descripcion);
-        var_dump($rutaImg);
-        var_dump($categoria_id);
-        var_dump($user_id['id']);
-        die;
         $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ?, c.url_foto = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
         $stmt->bind_param("sssii", $titulo, $descripcion, $rutaImg,$categoria_id, $user_id['id']);
         $stmt->execute();

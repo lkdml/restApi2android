@@ -171,7 +171,7 @@ class DbHandler {
      */
     public function getApiKeyById($user_id) {
         $stmt = $this->conn->prepare("SELECT api_key FROM usuarios WHERE id_usuario = ?");
-        $stmt->bind_param("i", $user_id);
+        $stmt->bind_param("i", $user_id['id']);
         if ($stmt->execute()) {
             // $api_key = $stmt->get_result()->fetch_assoc();
             // TODO
@@ -228,7 +228,7 @@ class DbHandler {
      */
     public function createCategoria($user_id, $titulo, $descripcion) {
         $stmt = $this->conn->prepare("INSERT INTO categorias(id_usuario,titulo,descripcion) VALUES(?,?,?)"); //FIX puede fallar
-        $stmt->bind_param("iss", $user_id,$titulo, $descripcion);
+        $stmt->bind_param("iss", $user_id['id'],$titulo, $descripcion);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -256,7 +256,7 @@ class DbHandler {
      */
     public function getCategoria($categoria_id, $user_id) {
         $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c WHERE c.id_categoria = ? AND c.id_usuario = ?");
-        $stmt->bind_param("ii", $categoria_id, $user_id);
+        $stmt->bind_param("ii", $categoria_id, $user_id['id']);
         if ($stmt->execute()) {
             $res = array();
             $stmt->bind_result($id, $titulo, $desc, $url_foto, $created_at);
@@ -281,7 +281,7 @@ class DbHandler {
      */
     public function getAllUserCategories($user_id) {
         $stmt = $this->conn->prepare("SELECT c.* FROM categorias c WHERE c.id_usuario = ?");
-        $stmt->bind_param("i", $user_id);
+        $stmt->bind_param("i", $user_id['id']);
         $stmt->execute();
         $tasks = $stmt->get_result();
         $stmt->close();
@@ -302,8 +302,14 @@ class DbHandler {
         } else {
             $rutaImg = '';
         }
-        $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ?, url_foto = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
-        $stmt->bind_param("ssisi", $titulo, $descripcion, $categoria_id, $rutaImg, $user_id);
+        var_dump($titulo);
+        var_dump($descripcion);
+        var_dump($rutaImg);
+        var_dump($categoria_id);
+        var_dump($user_id['id']);
+        die;
+        $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ?, c.url_foto = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
+        $stmt->bind_param("sssii", $titulo, $descripcion, $rutaImg,$categoria_id, $user_id['id']);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();
@@ -315,8 +321,8 @@ class DbHandler {
      * @param String $task_id id of the task to delete
      */
     public function deleteCategoria($user_id, $categoria_id) {
-        $stmt = $this->conn->prepare("DELETE c FROM categorias c, usuarios u WHERE c.id_categoria = ? AND u.id_usuario = t.id_usuario AND u.id_usuario = ?");
-        $stmt->bind_param("ii", $categoria_id, $user_id);
+        $stmt = $this->conn->prepare("DELETE c FROM categorias c, usuarios u WHERE c.id_categoria = ?  AND u.id_usuario = ?");
+        $stmt->bind_param("ii", $categoria_id, $user_id['id']);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();

@@ -232,22 +232,27 @@ $app->post('/categorias', 'authenticate', function() use ($app) { //TODO falta a
             }            
         });
 
+$app->put('/test/:id', function ($id) use ($app) {
+    $name = $app->request->put('name');
+    echo sprintf('PUT request for resource id %d, name "%s"', (int) $id, $name);
+});
+
 /**
  * Updating existing task
  * method PUT
  * params task, status
  * url - /tasks/:id
  */
-$app->put('/categorias/:id', 'authenticate', function($categoria_id) use($app) { //TODO Creo q esta mal no usar el task_id
+$app->put('/categorias', 'authenticate', function() use($app) { //TODO Creo q esta mal no usar el task_id
             // check for required params
             verifyRequiredParams(array('categoria_id', 'titulo','descripcion'));
 
-            global $user_id;            
+            global $user_id;   
             $categoria_id = $app->request->put('categoria_id');
             $titulo = $app->request->put('titulo');
             $descripcion = $app->request->put('descripcion');
             //$array_foto = $app->request->put('foto');
-            $array_foto = null;
+            $array_foto = '';
             $db = new DbHandler();
             $response = array();
 

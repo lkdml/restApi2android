@@ -1382,7 +1382,7 @@ class Slim
     {
         echo static::generateTemplateMarkup('404 Page Not Found', '<p>Esta pagina es resultado de la apiREST para el TP de Laboratorio V de UTN FRA.</p>
                                             <br><p>Para probar la apiREST, deben descargar la extension de chrome llamada "ARC" (advanced REST Client), e importar el archivo arc-export.json con las consultas tipo a realizar.</p>
-                                            <br><a href="./arc-export.json">arc-export.json</a>
+                                            <br><a href="./arc-export.json" download>arc-export.json</a>
                                             <br><p>Posteriormente importarlos dentro de la aplicacion ARC</p>
                                             <br>
                                             <h4>Datos para el uso de la API:</h4>

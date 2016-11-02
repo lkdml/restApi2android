@@ -1482,31 +1482,60 @@ table.gridtable td {
                                                 <tr>
                                                     <td>Consultar 1 Categoria</td>
                                                     <td>GET</td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
+                                                    <td>http://lkdml.myq-see.com/categorias/"id"</td>
+                                                    <td><li>AUTHORIZATION = "apiKey" </td>
+                                                    <td> Devuelve todas las categorias del usuario identificado con la apiKey:
+                                                    <li> Si es positivo: <br>
+                                                        {
+                                                        "error": false
+                                                        "id": 12
+                                                        "titulo": "Categoria 12."
+                                                        "desc": "Esto es lo que quiero q funcione.!!!!"
+                                                        "url_foto": ""
+                                                        "createdAt": "2016-10-27 16:16:06"
+                                                        }</td>
+                                                
                                                 </tr>
                                                 <tr>
                                                     <td>Actualizar Categoria</td>
                                                     <td>PUT</td>
-                                                    <td>
+                                                    <td>http://lkdml.myq-see.com/categorias</td>
+                                                    <td>Actualiza la categoria con los datos suministrados. (tener en cuenta q actualiza solo si difiere de lo guardado en la bd)
                                                     </td>
                                                     <td>
-                                                    </td>
-                                                    <td>
+                                                    <li>AUTHORIZATION = "apiKey"
+                                                    <li>titulo
+                                                    <li>descripcion
+                                                    <li>categoria_id
+                                                    <li>(proximamente foto)
+                                                    <br>Si funciona da:
+                                                    {
+                                                    "error": false
+                                                    "message": "Categoria actualizada correctamente"
+                                                    }
+                                                    <br>en caso contrario:
+                                                    {
+                                                    "error": true
+                                                    "message": "Fallo la actualización, intente nuevamente."
+                                                    }
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Borrar Categoria</td>
                                                     <td>DELETE</td>
+                                                    <td>http://lkdml.myq-see.com/categorias/"id"</td>
+                                                    <td><li>AUTHORIZATION = "apiKey" </td>
                                                     <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
+                                                    <br>Si funciona :
+                                                    {
+                                                    "error": false
+                                                    "message": "Task deleted succesfully"
+                                                    }
+                                                    <br>Si da error:
+                                                    {
+                                                    "error": true
+                                                    "message": "Task failed to delete. Please try again!"
+                                                    }
                                                     </td>
                                                 </tr>
                                             </table>

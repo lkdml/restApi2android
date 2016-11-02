@@ -255,6 +255,7 @@ class DbHandler {
      * @param String $task_id id of the task
      */
     public function getCategoria($categoria_id, $user_id) {
+        var_dump($categoria_id);die;
         $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c WHERE c.id_categoria = ? AND c.id_usuario = ?");
         $stmt->bind_param("ii", $categoria_id, $user_id['id']);
         if ($stmt->execute()) {

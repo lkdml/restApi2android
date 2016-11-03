@@ -304,7 +304,8 @@ class DbHandler {
                 $url = 'http://thecatapi.com/api/images/get?format=src&type=gif';
                 $img = './uploads/'.$this->generateRandomString().'.gif';
                 file_put_contents($img, file_get_contents($url));
-                $rutaImagen = 'uploads/'.$this->generateRandomString().'.gif';;
+                //$rutaImagen = 'uploads/'.$this->generateRandomString().'.gif';;
+                $rutaImagen = substr($img, 2);
             }
             return $rutaImagen;
     }

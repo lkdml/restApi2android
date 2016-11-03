@@ -226,9 +226,10 @@ class DbHandler {
      * @param String $user_id user id to whom task belongs to
      * @param String $task task text
      */
-    public function createCategoria($user_id, $titulo, $descripcion) {
-        $stmt = $this->conn->prepare("INSERT INTO categorias(id_usuario,titulo,descripcion) VALUES(?,?,?)"); //FIX puede fallar
-        $stmt->bind_param("iss", $user_id['id'],$titulo, $descripcion);
+    public function createCategoria($user_id, $titulo, $descripcion,$array_file=null) {
+        $rutaImg = $this->guardarImagen($array_file);
+        $stmt = $this->conn->prepare("INSERT INTO categorias(id_usuario,titulo,descripcion,url_foto) VALUES(?,?,?,?)"); //FIX puede fallar
+        $stmt->bind_param("isss", $user_id['id'],$titulo, $descripcion,$rutaImg);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -255,7 +256,6 @@ class DbHandler {
      * @param String $task_id id of the task
      */
     public function getCategoria($categoria_id, $user_id) {
-        var_dump($categoria_id);die;
         $stmt = $this->conn->prepare("SELECT c.id_categoria, c.titulo, c.descripcion, c.url_foto, c.created_at from categorias c WHERE c.id_categoria = ? AND c.id_usuario = ?");
         $stmt->bind_param("ii", $categoria_id, $user_id['id']);
         if ($stmt->execute()) {
@@ -289,8 +289,36 @@ class DbHandler {
         return $tasks;
     }
     private function guardarImagen($array_File){
-        return false;
+        
+        if(!empty($array_File)){
+                $file_path = "./uploads/";
+                $file_path = $file_path . basename( $array_File['uploaded_file']['name']);
+                if(move_uploaded_file($array_File['uploaded_file']['tmp_name'], $file_path) ){
+                    $rutaImagen = 'uploads/'.basename( $array_File['uploaded_file']['name']);
+                    echo "success";
+                } else{
+                    echo "fail";
+                    print_r(error_get_last());
+                }
+            } else {
+                $url = 'http://thecatapi.com/api/images/get?format=src&type=gif';
+                $img = './uploads/'.$this->generateRandomString().'.gif';
+                file_put_contents($img, file_get_contents($url));
+                $rutaImagen = 'uploads/'.$this->generateRandomString().'.gif';;
+            }
+            return $rutaImagen;
     }
+    
+    function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+}
+
     /**
      * Updating task
      * @param String $task_id id of the task
@@ -298,11 +326,7 @@ class DbHandler {
      * @param String $status task status
      */
     public function updateCategoria($user_id, $categoria_id, $titulo, $descripcion, $array_file=null) {
-        if (!is_null($array_file)){
-            $rutaImg = $this->guardarImagen($array_file);
-        } else {
-            $rutaImg = '';
-        }
+        $rutaImg = $this->guardarImagen($array_file);
         $stmt = $this->conn->prepare("UPDATE categorias c set c.titulo = ?, c.descripcion = ?, c.url_foto = ? WHERE c.id_categoria = ? AND c.id_usuario = ?");
         $stmt->bind_param("sssii", $titulo, $descripcion, $rutaImg,$categoria_id, $user_id['id']);
         $stmt->execute();

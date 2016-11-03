@@ -174,7 +174,6 @@ $app->get('/categorias', 'authenticate', function() {
  * Will return 404 if the task doesn't belongs to user
  */
 $app->get('/categorias/:id', 'authenticate', function($categoria_id) {
-    var_dump($categoria_id);die;
             global $user_id;
             $response = array();
             $db = new DbHandler();
@@ -215,11 +214,14 @@ $app->post('/categorias', 'authenticate', function() use ($app) { //TODO falta a
             
             
 
+            
+            
+
             global $user_id;
             $db = new DbHandler();
-
+            $archivo = $_FILES;
             // creating new task
-            $categoria_id = $db->createCategoria($user_id, $titulo , $descripcion);
+            $categoria_id = $db->createCategoria($user_id, $titulo , $descripcion,$_FILES);
 
             if ($categoria_id != NULL) {
                 $response["error"] = false;

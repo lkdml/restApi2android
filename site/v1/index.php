@@ -8,7 +8,7 @@ require '.././libs/Slim/Slim.php';
 \Slim\Slim::registerAutoloader();
 
 $app = new \Slim\Slim();
-
+var_dump($_SERVER);die;
 // User id from db - Global Variable
 $user_id = NULL;
 
